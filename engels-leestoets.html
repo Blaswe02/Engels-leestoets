@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engels Leestoets – VMBO KB Oefening</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1510;--paper:#f5f0e8;--paper2:#ede7d6;--paper3:#e3dbc8;
+  --rule:#c8bfa8;--accent:#b85c1a;--muted:#7a6e5c;
+  --correct:#1a6b3a;--wrong:#9b2215;--gold:#8a6a1a;
+  --tip-bg:#fdf3e0;--tip-border:#d4a843;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.7;background-image:repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(180,160,120,.12) 27px,rgba(180,160,120,.12) 28px);}
+
+/* HEADER */
+header{background:var(--ink);color:var(--paper);padding:0 2rem;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--accent);}
+.logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.05rem;letter-spacing:.04em;}
+.logo em{color:var(--accent);font-style:normal;}
+.hdr-score{font-size:.82rem;color:rgba(245,240,232,.65);}
+.hdr-score strong{color:#e8c97a;}
+.prog-bar{height:4px;background:rgba(255,255,255,.12);}
+.prog-fill{height:100%;background:var(--accent);transition:width .5s ease;width:0%;}
+
+/* TABS */
+.page-tabs{background:var(--paper2);border-bottom:1px solid var(--rule);padding:0 1.5rem;display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;}
+.page-tabs::-webkit-scrollbar{display:none;}
+.tab-item{display:flex;align-items:center;gap:.4rem;padding:.6rem .9rem;font-size:.76rem;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;cursor:default;}
+.tab-item.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.tab-item.completed{color:var(--correct);}
+.tab-dot{width:7px;height:7px;border-radius:50%;background:var(--rule);flex-shrink:0;}
+.tab-item.active .tab-dot{background:var(--accent);}
+.tab-item.completed .tab-dot{background:var(--correct);}
+.tab-sep{color:var(--rule);font-size:.65rem;}
+
+/* SCREENS */
+.screen{display:none;}.screen.active{display:block;}
+
+/* INTRO */
+.intro-wrap{max-width:580px;margin:3rem auto;padding:0 1.5rem;}
+.intro-card{background:white;border:1px solid var(--rule);border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.08);padding:2.5rem;}
+.intro-card h1{font-family:'Playfair Display',serif;font-size:1.9rem;line-height:1.2;margin-bottom:.4rem;}
+.intro-sub{color:var(--muted);font-style:italic;font-size:.88rem;margin-bottom:1.75rem;}
+.wf-steps{display:flex;flex-direction:column;gap:.8rem;margin-bottom:2rem;}
+.wf-step{display:flex;gap:.9rem;align-items:flex-start;}
+.wf-n{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--paper);font-family:'Playfair Display',serif;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.wf-txt strong{display:block;font-weight:600;font-size:.88rem;}
+.wf-txt span{font-size:.8rem;color:var(--muted);}
+.btn-primary{background:var(--accent);color:white;border:none;border-radius:3px;padding:.8rem 2.2rem;font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;cursor:pointer;letter-spacing:.03em;transition:background .15s;}
+.btn-primary:hover{background:#9a4a10;}
+
+/* PAGE LAYOUT */
+.page-layout{max-width:1040px;margin:0 auto;padding:1.5rem 1.5rem 4rem;display:grid;grid-template-columns:1fr 280px;gap:1.5rem;align-items:start;}
+.col-left{display:flex;flex-direction:column;gap:1.1rem;}
+
+/* TEXT CARD */
+.text-card{background:white;border:1px solid var(--rule);border-radius:3px;box-shadow:0 1px 8px rgba(0,0,0,.07);overflow:hidden;}
+.tc-hdr{background:var(--ink);color:var(--paper);padding:.7rem 1.4rem;display:flex;justify-content:space-between;align-items:center;}
+.tc-title{font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;}
+.tc-src{font-size:.7rem;color:rgba(245,240,232,.5);font-style:italic;}
+.pred-banner{background:var(--tip-bg);border-bottom:1px solid var(--tip-border);padding:.6rem 1.4rem;font-size:.8rem;color:var(--gold);}
+.pred-banner strong{color:var(--ink);}
+.pred-banner.open{background:#edf7f1;border-color:#8dc9a4;color:var(--correct);}
+.text-body{padding:1.4rem 1.6rem;font-size:.9rem;line-height:1.85;}
+.text-body p{margin-bottom:.95rem;}
+.text-body p:last-child{margin-bottom:0;}
+.p-num{display:inline-block;background:var(--ink);color:var(--paper);font-size:.63rem;font-weight:700;width:17px;height:17px;line-height:17px;text-align:center;border-radius:2px;margin-right:.4rem;vertical-align:middle;}
+
+/* QUESTION CARD */
+.q-card{background:white;border:1px solid var(--rule);border-radius:3px;box-shadow:0 1px 5px rgba(0,0,0,.05);overflow:hidden;transition:border-color .2s;}
+.q-card.res-c{border-left:3px solid var(--correct);}
+.q-card.res-w{border-left:3px solid var(--wrong);}
+.q-card.res-o{border-left:3px solid var(--tip-border);}
+.q-hdr{background:var(--paper2);border-bottom:1px solid var(--rule);padding:.7rem 1.1rem;display:flex;gap:.65rem;align-items:flex-start;}
+.q-badge{background:var(--ink);color:var(--paper);font-family:'Playfair Display',serif;font-weight:700;font-size:.68rem;padding:.18rem .5rem;border-radius:2px;white-space:nowrap;margin-top:2px;}
+.q-pts{font-size:.67rem;color:var(--muted);font-style:italic;margin-top:2px;}
+.q-txt{font-size:.86rem;line-height:1.5;flex:1;}
+
+/* PREDICTION BLOCK */
+.pred-block{padding:.8rem 1.1rem;border-bottom:1px solid var(--rule);}
+.pred-label{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.pred-opts{display:flex;flex-direction:column;gap:.35rem;}
+.pred-btn{display:flex;align-items:flex-start;gap:.55rem;background:var(--paper2);border:1px solid var(--rule);border-radius:3px;padding:.5rem .7rem;cursor:pointer;font-family:'Source Serif 4',serif;font-size:.82rem;color:var(--ink);text-align:left;line-height:1.45;transition:background .1s;}
+.pred-btn:hover:not(:disabled){background:var(--paper3);}
+.pred-btn.picked{background:#fff8e1;border-color:var(--tip-border);font-weight:600;}
+.pred-btn:disabled{cursor:default;}
+.pred-ltr{font-family:'Playfair Display',serif;font-weight:700;font-size:.68rem;min-width:19px;height:19px;border-radius:2px;background:var(--paper3);border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.pred-btn.picked .pred-ltr{background:var(--tip-border);color:white;border-color:var(--tip-border);}
+
+/* ANSWER BLOCK */
+.ans-block{padding:.8rem 1.1rem;border-bottom:1px solid var(--rule);}
+.ans-block.locked{opacity:.35;pointer-events:none;}
+.ans-label{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.ans-opts{display:flex;flex-direction:column;gap:.35rem;}
+.ans-btn{display:flex;align-items:flex-start;gap:.55rem;background:var(--paper2);border:1px solid var(--rule);border-radius:3px;padding:.5rem .7rem;cursor:pointer;font-family:'Source Serif 4',serif;font-size:.82rem;color:var(--ink);text-align:left;line-height:1.45;transition:background .1s;}
+.ans-btn:hover:not(:disabled){background:var(--paper3);}
+.ans-btn:disabled{cursor:default;}
+.ans-btn.correct{background:#edf7f1;border-color:var(--correct);color:var(--correct);font-weight:600;}
+.ans-btn.wrong{background:#fdf0ef;border-color:var(--wrong);color:var(--wrong);}
+.ans-ltr{font-family:'Playfair Display',serif;font-weight:700;font-size:.68rem;min-width:19px;height:19px;border-radius:2px;background:var(--paper3);border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ans-btn.correct .ans-ltr{background:var(--correct);color:white;border-color:var(--correct);}
+.ans-btn.wrong .ans-ltr{background:var(--wrong);color:white;border-color:var(--wrong);}
+
+/* FEEDBACK + STRATEGY TIP */
+.fb-block{display:none;padding:.7rem 1.1rem;border-bottom:1px solid var(--rule);}
+.fb-block.show{display:block;}
+.fb-result{font-size:.82rem;line-height:1.5;padding:.5rem .7rem;border-radius:3px;margin-bottom:.5rem;}
+.fb-result.correct{background:#edf7f1;border:1px solid #8dc9a4;color:var(--correct);}
+.fb-result.wrong{background:#fdf0ef;border:1px solid #e8a09b;color:#7a1e15;}
+.strat-tip-box{background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:3px;padding:.5rem .7rem;font-size:.78rem;color:var(--gold);line-height:1.5;}
+.strat-tip-box strong{color:var(--ink);}
+
+/* OPEN QUESTION */
+.open-block{padding:.8rem 1.1rem;border-bottom:1px solid var(--rule);}
+.open-block.locked{opacity:.35;pointer-events:none;}
+.open-label{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+.open-ta{border:1px solid var(--rule);border-radius:3px;padding:.5rem .7rem;font-family:'Source Serif 4',serif;font-size:.82rem;background:var(--paper);color:var(--ink);width:100%;resize:vertical;min-height:70px;}
+.open-ta:focus{outline:none;border-color:#1a3d6b;}
+.reveal-btn{margin-top:.4rem;background:var(--paper3);border:1px solid var(--rule);border-radius:2px;padding:.38rem 1rem;font-family:'Source Serif 4',serif;font-size:.78rem;cursor:pointer;color:var(--ink);transition:background .1s;display:block;}
+.reveal-btn:hover{background:var(--paper2);}
+.model-box{display:none;margin-top:.4rem;background:#edf7f1;border:1px solid #8dc9a4;border-radius:3px;padding:.55rem .75rem;font-size:.78rem;color:#144d28;line-height:1.6;}
+.model-box.show{display:block;}
+.strat-tip-open{margin-top:.5rem;background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:3px;padding:.5rem .7rem;font-size:.78rem;color:var(--gold);line-height:1.5;display:none;}
+.strat-tip-open.show{display:block;}
+.strat-tip-open strong{color:var(--ink);}
+
+/* PAGE NAV */
+.page-nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.3rem;background:white;border:1px solid var(--rule);border-radius:3px;box-shadow:0 1px 5px rgba(0,0,0,.05);}
+.page-nav-info{font-size:.8rem;color:var(--muted);font-style:italic;}
+.btn-next{background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:.65rem 1.6rem;font-family:'Playfair Display',serif;font-weight:700;font-size:.88rem;cursor:pointer;letter-spacing:.03em;transition:opacity .15s;}
+.btn-next:hover:not(:disabled){opacity:.8;}
+.btn-next:disabled{opacity:.3;cursor:not-allowed;}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:1.1rem;position:sticky;top:80px;}
+.side-card{background:white;border:1px solid var(--rule);border-radius:3px;box-shadow:0 1px 5px rgba(0,0,0,.05);overflow:hidden;}
+.side-hdr{background:var(--ink);color:var(--paper);padding:.5rem .9rem;font-family:'Playfair Display',serif;font-weight:700;font-size:.77rem;letter-spacing:.05em;}
+.side-body{padding:.75rem .9rem;}
+.page-dots{display:flex;flex-direction:column;gap:.45rem;}
+.pdot-row{display:flex;align-items:center;gap:.55rem;font-size:.76rem;}
+.p-dot{width:20px;height:20px;border-radius:2px;background:var(--paper2);border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:var(--muted);flex-shrink:0;}
+.p-dot.cur{background:rgba(184,92,26,.1);border-color:var(--accent);color:var(--accent);}
+.p-dot.done{background:#edf7f1;border-color:var(--correct);color:var(--correct);}
+.pdot-lbl{color:var(--muted);font-size:.75rem;}
+.pdot-lbl.cur{color:var(--accent);font-weight:600;}
+.pdot-lbl.done{color:var(--correct);}
+.q-dots{display:flex;flex-wrap:wrap;gap:.3rem;}
+.q-dot{width:20px;height:20px;border-radius:2px;background:var(--paper3);border:1px solid var(--rule);font-size:.6rem;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:center;}
+.q-dot.c{background:#edf7f1;border-color:var(--correct);color:var(--correct);}
+.q-dot.w{background:#fdf0ef;border-color:var(--wrong);color:var(--wrong);}
+.q-dot.o{background:#fdf3e0;border-color:var(--tip-border);color:var(--gold);}
+.cheat-list{display:flex;flex-direction:column;gap:.6rem;}
+.cheat-row{display:flex;gap:.5rem;font-size:.75rem;line-height:1.45;}
+.cheat-icon{font-size:.9rem;flex-shrink:0;}
+.cheat-row strong{color:var(--ink);display:block;font-size:.76rem;}
+.cheat-row span{color:var(--muted);}
+
+/* READING TIMER */
+.timer-bar-wrap{background:var(--paper2);border-bottom:1px solid var(--rule);padding:.6rem 1.4rem;display:flex;align-items:center;gap:.9rem;}
+.timer-bar-wrap.done{background:#edf7f1;border-color:#8dc9a4;}
+.timer-track{flex:1;height:6px;background:var(--rule);border-radius:3px;overflow:hidden;}
+.timer-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 1s linear;width:100%;}
+.timer-bar-wrap.done .timer-fill{background:var(--correct);}
+.timer-msg{font-size:.78rem;color:var(--muted);white-space:nowrap;min-width:7rem;text-align:right;}
+.timer-msg strong{color:var(--accent);}
+.timer-bar-wrap.done .timer-msg{color:var(--correct);}
+/* Locked answer block during timer */
+.ans-block.timed{opacity:.45;pointer-events:none;}
+.open-block.timed{opacity:.45;pointer-events:none;}
+.phase-banner{border-radius:3px;padding:.75rem 1.25rem;font-size:.85rem;line-height:1.55;margin-bottom:.1rem;}
+.phase-banner.pred{background:var(--tip-bg);border:1px solid var(--tip-border);color:var(--gold);}
+.phase-banner.pred strong{color:var(--ink);display:block;margin-bottom:.2rem;}
+.phase-banner.ans{background:#edf7f1;border:1px solid #8dc9a4;color:var(--correct);}
+.phase-banner.ans strong{color:var(--ink);display:block;margin-bottom:.2rem;}
+/* PRED RECAP on answer screen */
+.pred-recap{padding:.45rem 1.1rem .1rem;}
+.pred-recap-text{font-size:.78rem;color:var(--gold);background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:3px;padding:.35rem .65rem;}
+/* OPEN PLACEHOLDER on pred screen */
+.open-placeholder{padding:.75rem 1.1rem;font-size:.8rem;color:var(--muted);font-style:italic;border-top:1px dashed var(--rule);}
+/* PRED DONE card */
+.q-card.pred-done{border-left:3px solid var(--tip-border);}
+.results-wrap{max-width:520px;margin:3rem auto;padding:0 1.5rem;}
+.results-card{background:white;border:1px solid var(--rule);border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.1);padding:2.5rem;text-align:center;}
+.res-emoji{font-size:3.2rem;margin-bottom:.6rem;}
+.res-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;margin-bottom:.3rem;}
+.res-score{font-family:'Playfair Display',serif;font-size:3.2rem;font-weight:900;color:var(--accent);line-height:1;margin:.65rem 0;}
+.res-sub{color:var(--muted);font-style:italic;font-size:.85rem;margin-bottom:1.5rem;}
+.res-grid{display:flex;justify-content:center;gap:.9rem;margin-bottom:1.5rem;}
+.res-cell{background:var(--paper2);border:1px solid var(--rule);border-radius:3px;padding:.7rem 1.1rem;text-align:center;}
+.res-n{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;}
+.res-l{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+@media(max-width:700px){.page-layout{grid-template-columns:1fr;}.sidebar{position:static;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Engels<em>KB</em> · Leestoets Oefening</div>
+  <div class="hdr-score">Goed: <strong id="hdr-c">0</strong> &nbsp;|&nbsp; Fout: <strong id="hdr-w">0</strong></div>
+</header>
+<div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+<div class="page-tabs" id="tabs"></div>
+
+<!-- INTRO -->
+<div class="screen active" id="s-intro">
+  <div class="intro-wrap">
+    <div class="intro-card">
+      <h1>Engels Leestoets<br>Oefening</h1>
+      <p class="intro-sub">VMBO KB &nbsp;&middot;&nbsp; ~50 minuten &nbsp;&middot;&nbsp; 13 teksten &nbsp;&middot;&nbsp; 33 vragen</p>
+      <div class="wf-steps">
+        <div class="wf-step"><div class="wf-n">1</div><div class="wf-txt"><strong>Lees de vragen en opties</strong><span>Bekijk per vraag de antwoordmogelijkheden &mdash; zonder de tekst te lezen.</span></div></div>
+        <div class="wf-step"><div class="wf-n">2</div><div class="wf-txt"><strong>Maak een voorspelling</strong><span>Klik het antwoord aan dat jij denkt dat goed is. Daarna opent de tekst.</span></div></div>
+        <div class="wf-step"><div class="wf-n">3</div><div class="wf-txt"><strong>Lees de tekst gericht</strong><span>Zoek het antwoord. Je mag je mening aanpassen.</span></div></div>
+        <div class="wf-step"><div class="wf-n">4</div><div class="wf-txt"><strong>Geef je definitieve antwoord</strong><span>Na je antwoord zie je de feedback &eacute;n een leestip.</span></div></div>
+      </div>
+      <button class="btn-primary" onclick="startQuiz()">Start oefening &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<div id="pages"></div>
+
+<!-- RESULTS -->
+<div class="screen" id="s-results">
+  <div class="results-wrap">
+    <div class="results-card">
+      <div class="res-emoji" id="r-emoji">&#128203;</div>
+      <div class="res-title">Toets afgerond!</div>
+      <div class="res-score" id="r-score">0/0</div>
+      <div class="res-sub" id="r-sub"></div>
+      <div class="res-grid">
+        <div class="res-cell"><div class="res-n" id="r-c" style="color:var(--correct)">0</div><div class="res-l">Goed</div></div>
+        <div class="res-cell"><div class="res-n" id="r-w" style="color:var(--wrong)">0</div><div class="res-l">Fout</div></div>
+        <div class="res-cell"><div class="res-n" id="r-o" style="color:var(--gold)">0</div><div class="res-l">Open</div></div>
+      </div>
+      <button class="btn-primary" onclick="restart()">&#128260; Opnieuw proberen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEXTS=[
+  {id:1,pt:'Tekst 1',title:'Smart Rubbish Bin',source:'dailymail.co.uk, 2019',secs:40,
+   paras:['It is one of the most forgotten and painful chores \u2013 taking out the trash. Now, SmartCan, developed by the firm Rezzi, eliminates the need for homeowners to drag their garbage cans to the curb by providing a motorized trash can attachment and corresponding mobile app. Users can set the specific day and time they need their trash to be at the curb for pickup, and the SmartCan attachment will get it there autonomously. Once picked up by collectors, the robotic trash can heads back to its base after having sensed the vertical movement.',
+    '\u2018We want to help people eliminate unnecessary chores from their daily lives,\u2019 said Rezzi CEO and SmartCan creator Andrew Murray. \u2018We see an opportunity to take the \u201cInternet of Things\u201d beyond just turning off lights or turning on music, and really help alleviate the burden of the mundane physical tasks that everyone faces.\u2019'],
+   questions:[
+    {id:'q1',num:'Vraag 1',pts:1,type:'mc',text:'Hoe doet de SmartCan het volgens alinea 1 om klusjes te elimineren?',paraRef:1,strat:'scan',opts:['De bak geeft een melding als hij vol is.','De bak is makkelijk op te tillen en te legen.','De bak komt naar je toe als je er iets in gooit.','De bak rijdt zelf naar de straat en terug.'],correct:3,fb:'Alinea 1: "gets it there autonomously" en "heads back to its base" \u2014 de bak rijdt zelf.'},
+    {id:'q2',num:'Vraag 2',pts:1,type:'mc',text:'What does the SmartCan do AFTER the rubbish has been collected?',paraRef:null,strat:'scan',opts:['It sends a notification to the homeowner.','It automatically returns to its base.','It waits at the curb for the next collection.','It orders a new bag through the app.'],correct:1,fb:'"The robotic trash can heads back to its base after having sensed the vertical movement."'}
+   ]},
+  {id:2,pt:'Tekst 2',title:'Hot Water Bottles',source:'metro.co.uk, 2018',secs:60,
+   paras:['As the winter chill returns to the air residents of UK cities may start to see strange things appearing on their trees. Don\u2019t be alarmed if you spot hot water bottles hanging in a tree \u2013 they\u2019re not a strange message or an art installation. A group is tying hot water bottles to tree branches to help homeless people as the temperature drops. The hot water bottles are labelled with directions to nearby businesses that have agreed to provide hot water. The scheme is run by the Hot Water Bottle Network, which operates in Bristol, Bath, Leicester, and Brighton, and depends on donations of hot water bottles and participation from local businesses.',
+    'It\u2019s a kind gesture to those living on the streets, who will struggle with the cold. Each place\u2019s network has its own Facebook group where people can offer up their hot water bottles or sign up their business to offer hot water. The network is keen to expand into more cities, starting with Cardiff, and hopes to get more people involved. If you\u2019d like to help out, search for a Hot Water Bottle Network group near you on Facebook, and if there isn\u2019t one, consider getting in touch with the organisers to start your own.',
+    '\u2018It\u2019s already cold on the streets,\u2019 said Bristol organiser Pete Wentland. \u2018We are taking this action as an emergency measure to try to make the winter that tiny bit more bearable for those who face the worst of it. In encouraging local businesses to help rough sleepers we also hope for a breaking down of the barriers that separate us.\u2019'],
+   questions:[
+    {id:'q3',num:'Vraag 3',pts:1,type:'mc',text:'Why are hot water bottles hanging from trees according to paragraph 1?',paraRef:1,strat:'key',opts:['A \u2014 to ask companies for donations','B \u2014 to provide help for the homeless','C \u2014 to show a display of local art','D \u2014 to stimulate customers to shop locally'],correct:1,fb:'Paragraph 1: "A group is tying hot water bottles to tree branches to help homeless people as the temperature drops."'},
+    {id:'q4',num:'Vraag 4',pts:1,type:'mc',text:'What does Pete Wentland hope will happen IN ADDITION to keeping homeless people warm? (paragraph 3)',paraRef:3,strat:'key',opts:['A \u2014 Local businesses will donate more money.','B \u2014 The initiative will spread to more cities.','C \u2014 The gap between rough sleepers and businesses will get smaller.','D \u2014 More people will use Facebook to find help.'],correct:2,fb:'"In encouraging local businesses to help rough sleepers we also hope for a breaking down of the barriers that separate us."'},
+    {id:'q5',num:'Vraag 5',pts:2,type:'open',text:'Geef van elke bewering aan of die WEL of NIET wordt genoemd in alinea 2 en/of 3. Antwoord in het Nederlands.\n1. Het is populair geworden door sociale media.\n2. Het initiatief is als eerste in Cardiff uitgevoerd.\n3. Het zal veel werk opleveren voor lokale ondernemingen.\n4. Het wil mensen dichter bij elkaar brengen.',paraRef:null,strat:'key',modelAnswer:'<strong>1 WEL</strong> \u2013 Facebook-groepen worden genoemd (sociale media).<br><strong>2 NIET</strong> \u2013 Cardiff is de volgende stad, niet de eerste.<br><strong>3 NIET</strong> \u2013 \u201eVeel werk\u201d wordt niet genoemd.<br><strong>4 WEL</strong> \u2013 \u201ea breaking down of the barriers that separate us\u201d.'}
+   ]},
+  {id:3,pt:'Tekst 4',title:'Young Runner Kept Going',source:'The Guardian, 2019',secs:55,
+   paras:['It took nine-year-old Kade Lovell longer than expected to finish his 5km race in Minnesota, but only because he was busy accidentally winning a separate 10km event. Kade\u2019s mother, Heather, became worried when her son didn\u2019t cross the finish line of the Francis Franny Flyer 5K in Sartell earlier this month. She drove along the route looking for him and found herself crying when he appeared to have gone missing. \u201cI had everyone looking for him, even a fireman,\u201d Heather Lovell said.',
+    'Eventually, a spectator phoned Heather Lovell\u2019s brother-in-law, who was in the 10km race, to let him know there was a \u201clittle kid who was running really well\u201d in the 10km event. Kade said a woman told him to keep going when he approached the 5km turn and he did, despite his confusion. \u201cA lady told me to keep going straight. So I kept going straight,\u201d he said.',
+    'Race organisers told Kade\u2019s mother he had won. Initially she thought they meant he had won his age group \u2013 but he was first-place overall. He finished in just over 48 minutes, a minute faster than the 40-year-old second-place contestant. \u201cHe actually probably did better than he normally does because he was trying to finish and in panic mode,\u201d Heather Lovell said. Even though he is only nine years old, Kade is already an experienced runner. He started running with a cross country club when he was six.'],
+   questions:[
+    {id:'q6',num:'Vraag 6',pts:1,type:'mc',text:'Why was Kade\u2019s mother crying? (paragraph 1)',paraRef:1,strat:'key',opts:['A \u2014 She could not find her son at the finish line.','B \u2014 She felt disappointed she was not being listened to.','C \u2014 She found out her son might be injured.','D \u2014 She was desperate because her son had run away.'],correct:0,fb:'"Found herself crying when he appeared to have gone missing" \u2014 she could not find him.'},
+    {id:'q7',num:'Vraag 7',pts:1,type:'mc',text:'Why did Kade run the 10km instead of the 5km according to paragraph 2?',paraRef:2,strat:'scan',opts:['A \u2014 He decided to follow a family member.','B \u2014 He thought he had a chance to win the longer race.','C \u2014 He was directed towards the longer race.','D \u2014 He was sent the wrong way by a family member.'],correct:2,fb:'"A lady told me to keep going straight. So I kept going straight." \u2014 a woman directed him the wrong way.'},
+    {id:'q8',num:'Vraag 8',pts:2,type:'open',text:'Welke TWEE dingen laten zien dat Kade al v\u00f3\u00f3r dit incident een ervaren hardloper was? Gebruik alinea 3. Antwoord in het Nederlands.',paraRef:null,strat:'key',modelAnswer:'<strong>1)</strong> Hij finishte sneller dan de tweede (een 40-jarige) \u2014 48 minuten.<br><strong>2)</strong> Hij liep al seit zijn zesde met een crosscountry club.'}
+   ]},
+  {id:4,pt:'Tekst 9',title:'Longo Receives Football Scholarship',source:'people.com, 2017',secs:70,
+   paras:['When Becca Longo signed her letter of intent to play college American football on National Signing Day on February 1, she was excited about the personal milestone in her own life. Moments later, she discovered that it was a huge, history-making moment for women in sports, too. Longo is the first female to receive a college football scholarship. She signed with Adams State University in Alamosa, Colorado, as a kicker. \u201cI had no idea,\u201d Longo tells People Magazine. \u201cIt didn\u2019t really kick in until a couple of hours after. I just thought I was signing a piece of paper to go play the sport I love again.\u201d',
+    'Growing up with a brother 11 years older than she was, 18-year-old Longo said there wasn\u2019t much opportunity for shared interests \u2013 except for football, their \u2018happy medium\u2019. Her older brother played on his high school team, and would pass around a ball with his sister on the weekends.',
+    'So when high school rolled around, Longo tried out for the football team. She recorded a highlights film to showcase her skills, and sent it out to a number of schools. She received multiple responses, one of which was from Adams State University. After her season wrapped up, the offensive coordinator traveled to her hometown to speak with her about a potential scholarship.',
+    'Since her story started gaining national attention, Longo says she\u2019s received support from people all over the country. But that hasn\u2019t always been the case. Before her first high school football game, countless classmates made fun of her. \u201cI got a lot of negativity, and people saying I couldn\u2019t do it. But that\u2019s just what pushed me to do what I\u2019m doing.\u201d',
+    'Her Basha High School teammates, whom Longo calls her \u2018brothers\u2019, have never treated her any differently. \u201cIt\u2019s just like hanging out with your best friends every day after school. That\u2019s what they are to me, they\u2019re my brothers.\u201d',
+    'In her conversations with head coach Timm Rosenbach, her gender was never a topic of conversation. \u201cHe didn\u2019t treat me like a girl. He treats me like a football player.\u201d',
+    '\u201cPeople need to stop listening to others and stop letting them influence their mindset. They just need to go and do what they love.\u201d'],
+   questions:[
+    {id:'q9',num:'Vraag 9',pts:1,type:'mc',text:'What did Becca Longo do to get into university according to paragraph 3?',paraRef:3,strat:'scan',opts:['A \u2014 She applied for funding to pay for education.','B \u2014 She made a video to demonstrate her talent.','C \u2014 She took extra classes to improve.','D \u2014 She visited the school to meet the team.'],correct:1,fb:'"She recorded a highlights film to showcase her skills, and sent it out to a number of schools."'},
+    {id:'q10',num:'Vraag 10',pts:1,type:'mc',text:'How have some people responded to her football career in the past according to paragraph 4?',paraRef:4,strat:'key',opts:['A \u2014 They were jealous of her friendships with boys on the team.','B \u2014 They told her she would never succeed.','C \u2014 They were unhappy with her success within the sport.'],correct:1,fb:'"I got a lot of negativity, and people saying I couldn\u2019t do it." \u2192 B matches.'},
+    {id:'q11',num:'Vraag 11',pts:1,type:'mc',text:'What is said about Timm Rosenbach in paragraph 6?',paraRef:6,strat:'key',opts:['A \u2014 He has experience coaching women in men\u2019s teams.','B \u2014 He is very enthusiastic about recruiting a woman.','C \u2014 He struggles with Becca being the only girl.','D \u2014 He treats Becca just like any other player.'],correct:3,fb:'"He treats me like a football player" \u2014 no different treatment.'}
+   ]},
+  {id:5,pt:'Tekst 11',title:'Ikea Balenciaga',source:'adweek.com, 2017',secs:45,
+   paras:['The designers at Balenciaga must be big Ikea fans, because the French fashion house just unveiled a fancy new leather bag that looks remarkably like Ikea\u2019s famous blue shopping bag \u2013 though the price tag looks a whole lot different. Balenciaga\u2019s goes for $2,145. Ikea\u2019s is just 99 cents.',
+    'This was too much comedy for Ikea to process silently. In Sweden Ikea whipped up a printed ad comically explaining how to tell the difference between Balenciaga\u2019s bag and Ikea\u2019s Frakta bag. Tips include: shake it (if it rustles, it\u2019s real), it carries hockey gear and bricks, throw it in the dirt and rinse with a garden hose, fold it to purse size, check for an authentic Ikea tag inside, and the price: only $0.99.',
+    'Johan Holmgren, creative director, says the response ad came together very quickly. \u201cThe day after the Balenciaga bag was launched, I said we\u2019d have the creative work ready within two hours. We shot the bag with that same feeling and lighting as the Balenciaga bag. We are deeply flattered. Nothing beats the versatility of a great big blue bag!\u201d'],
+   questions:[
+    {id:'q12',num:'Vraag 12',pts:1,type:'mc',text:'What is mentioned in paragraph 1?',paraRef:1,strat:'skim',opts:['A \u2014 A new designer bag looks a lot like Ikea\u2019s shopping bag.','B \u2014 Balenciaga designers have been shopping at Ikea.','C \u2014 Fashion houses are making fun of Ikea bag quality.','D \u2014 Ikea wants to raise the price of their popular bag.'],correct:0,fb:'"Looks remarkably like Ikea\u2019s famous blue shopping bag" \u2014 the bags look very similar.'},
+    {id:'q13',num:'Vraag 13',pts:1,type:'mc',text:'What is the tone of the Ikea advertisement? (paragraph 2)',paraRef:2,strat:'skim',opts:['A \u2014 critical','B \u2014 humorous','C \u2014 irritated'],correct:1,fb:'The ad is playful and self-confident \u2014 tips like "throw it in the dirt" show Ikea is having fun.'},
+    {id:'q14',num:'Vraag 14',pts:1,type:'mc',text:'What was special about the Ikea advertisement besides being made quickly? (paragraph 3)',paraRef:3,strat:'key',opts:['A \u2014 It appeared on all their social media channels.','B \u2014 It was combined with a sales offer.','C \u2014 It was designed to look identical to the Balenciaga ad.','D \u2014 It was made by a famous photographer.'],correct:2,fb:'"Shot the bag with that same feeling and lighting as the Balenciaga bag" \u2014 they copied the visual style.'}
+   ]},
+  {id:6,pt:'Tekst 3',title:'Twins',source:'ABC News, 2016',
+   paras:['Emily and Seth Peterson of West Barnstable welcomed their sons in the early morning hours of November 6 at Cape Cod Hospital. Samuel was born 5 pounds, 13 ounces at 1:40 a.m., shortly before the 2 a.m. hour when clocks were turned back an hour. Brother Ronan arrived at 5 pounds, 13 ounces 30 minutes later. Because he was born after the clocks fell back one hour, his official time of birth was declared 1:10 a.m. instead of 2:10 a.m. So even though Ronan was born after Samuel, he is, at least on paper, the older twin.',
+    '\u201cMy husband was the first to say it, \u2018Here\u2019s a riddle for you!\u2019\u201d mom Emily Peterson, 32, told ABC News today. \u201cIt literally took me a day to wrap my head around it. I didn\u2019t realize it was quite that big of a deal until my nurse turned around and said \u2018I\u2019ve been working here for 40 years and I haven\u2019t seen anything like that.\u2019\u201d Samuel and Ronan Peterson have since joined big sister Aubrey, 2, at home with mom and dad.'],
+   questions:[
+    {id:'q15',num:'Vraag 15',pts:1,type:'mc',text:'Wat wordt duidelijk over de tweeling in dit bericht? Volgens de geboorteaktes\u2026',paraRef:null,strat:'key',opts:['A \u2014 is de baby die als eerste is geboren niet de oudste maar de jongste.','B \u2014 is de jongste baby zwaarder dan de andere.','C \u2014 is de naam van de jongste baby met de oudste verwisseld.','D \u2014 is de tijd van de jongste baby verkeerd vermeld.'],correct:0,fb:'Ronan werd later geboren maar staat op papier als oudste door de zomertijdwissel \u2014 antwoord A.'}
+   ]},
+  {id:7,pt:'Tekst 5',title:"McDonald\u2019s French Fries Shortage",source:'BBC.com, 2021',
+   paras:["The world\u2019s biggest fast food company McDonald\u2019s is suffering a chip shortage in Japan. The firm has said it is experiencing delays of shipments of the potatoes used to make its famous French fries. As a result it will only sell small portions of its French fries in Japan.",
+    '"McDonald\u2019s Japan will temporarily limit sales of Medium- and Large-sized French Fries as a proactive measure to ensure customers can continue to enjoy McDonald\u2019s French Fries. Customers will still be able to order Small-sized French Fries at all of our restaurants. To date, there have been no breaks in supply," the company told the BBC.',
+    "McDonald\u2019s said it usually imports the potatoes it uses from a port near Vancouver in Canada. However, ships have faced delays due to flood damage. It will now turn to alternative measures, including flying supplies to Japan, the company said in a statement."],
+   questions:[
+    {id:'q16',num:'Vraag 16',pts:2,type:'open',text:'Welke twee maatregelen neemt McDonald\u2019s in Japan om het tekort aan friet op te lossen? Geef antwoord in het Nederlands.',paraRef:null,strat:'key',modelAnswer:'<strong>1)</strong> Alleen kleine porties friet verkopen (Medium en Large tijdelijk niet beschikbaar).<br><strong>2)</strong> Voorraden per vliegtuig naar Japan laten vliegen.'}
+   ]},
+  {id:8,pt:'Tekst 6',title:'A Tree as a Postbox',source:'BBC.com, 2018',
+   paras:['On a chilly afternoon deep in northern Germany\u2019s Dodauer Forest, 100km north-east of Hamburg, a postman wearing a bright yellow uniform was walking through the woods. When he reached an open place, he rummaged through his bag and then slowly climbed a 3m-tall wooden ladder to deliver a purple envelope to a 500-year-old oak tree. \u201cJust one today,\u201d he told me, before crunching back through the forest and disappearing towards the next letterbox on his route.',
+    'The purple envelope was from Denies in Bavaria. She\u2019s 55, isn\u2019t afraid to laugh at herself and loves nature. She knows what she wants, doesn\u2019t mind being alone but wonders if there\u2019s a man out there who can surprise her. If so, she hopes that he, too, is looking for love inside the tiny knothole in this oak tree.',
+    'Known as \u2018Der Br\u00e4utigamseiche\u2019 (the Bridegroom\u2019s Oak), this ancient timber outside the town of Eutin has been matching singles long before matchmaking platform Tinder, and is reportedly responsible for more than 100 marriages. Today, people from all over the planet write letters addressed to the tree, hoping that for the price of a postage stamp, they may find a partner.',
+    '\u201cThere\u2019s something so magical and romantic about it,\u201d said 72-year-old Karl-Heinz Martens, who delivered letters to the tree as its postman for 20 years, starting in 1984. \u201cOn the internet, facts and questions match people, but at the tree, it\u2019s a beautiful coincidence \u2013 like fate.\u201d Though retired now, Martens still keeps a scrapbook filled with photographs, letters and newspaper clippings from his time as love\u2019s official messenger. In his two decades of service to the oak, Martens delivered letters from six continents, often in languages he didn\u2019t understand. He explained that while today many people know about the tree, 128 years ago it was a secret shared by two lovers. The only rule, Martens explained, is that if you open a letter you don\u2019t want to answer, you should place it back in the tree for someone else to find.',
+    '\u201cThe tree receives about 1,000 letters a year,\u201d said Martin Grundler, spokesman for Deutsche Post. \u201cMost come in the summertime. I suppose that\u2019s when everyone wants to fall in love.\u201d For those sweet on someone specific, there\u2019s a legend that says if a woman walks around the oak\u2019s trunk three times under a full moon while thinking of her beloved, without speaking or laughing, she\u2019ll marry within the year.',
+    'Today the Bridegroom\u2019s Oak remains the only tree in the world with its own mailing address. Six days a week for the past 91 years, a postman has walked through the forest \u2013 rain, snow or shine \u2013 and climbed the ladder to stuff letters from starry-eyed singles into the tree.'],
+   questions:[
+    {id:'q17',num:'Vraag 17',pts:1,type:'mc',text:'What becomes clear about a postman in paragraph 1?',paraRef:1,strat:'skim',opts:['A \u2014 Usually he does his work more quickly.','B \u2014 Usually he has more letters to deliver.','C \u2014 Usually he has to visit more locations.','D \u2014 Usually he is joined by more colleagues.'],correct:1,fb:'He says \u201cJust one today\u201d \u2014 implying he normally delivers more letters.'},
+    {id:'q18',num:'Vraag 18',pts:1,type:'mc',text:'Why do people like Denies send letters to a tree according to paragraphs 2 and 3?',paraRef:null,strat:'key',opts:['A \u2014 because they believe it will bring them good luck for the rest of their lives','B \u2014 because they believe it will help them find a partner','C \u2014 because they want to inspire their partners to marry them','D \u2014 because they hope it will solve relationship problems'],correct:1,fb:'Paragraph 3: \u201choping that for the price of a postage stamp, they may find a partner\u201d.'},
+    {id:'q19',num:'Vraag 19',pts:1,type:'mc',text:'Which statement about the tree is true according to paragraph 3?',paraRef:3,strat:'key',opts:['A \u2014 It became known through a love story.','B \u2014 It has been an inspiration for dating apps.','C \u2014 It is a popular wedding location.','D \u2014 It is also known to people abroad.'],correct:3,fb:'\u201cPeople from all over the planet write letters addressed to the tree\u201d \u2014 D is correct.'},
+    {id:'q20',num:'Vraag 20',pts:1,type:'mc',text:'What becomes clear from paragraph 5?',paraRef:5,strat:'key',opts:['A \u2014 Deutsche Post started the myth about the tree.','B \u2014 Mainly women send love letters to the tree.','C \u2014 Some people seem to think the tree has special powers.','D \u2014 The tree attracts many visitors all year round.'],correct:2,fb:'The legend about walking around the tree under a full moon suggests people believe it has special powers \u2014 C.'},
+    {id:'q21',num:'Vraag 21',pts:1,type:'mc',text:'What becomes clear from paragraph 6?',paraRef:6,strat:'skim',opts:['A \u2014 The letters are delivered by specially selected postmen.','B \u2014 The letters are delivered only once a week.','C \u2014 The tree has its own unique postal address.','D \u2014 The tree is quite difficult to find.'],correct:2,fb:'\u201cThe only tree in the world with its own mailing address\u201d \u2014 C is correct.'}
+   ]},
+  {id:9,pt:'Tekst 7',title:'Free to Any Willing Home',source:'littlethings.com, 2015',
+   paras:['Some people, like myself, love being around animals. Personally, I love dogs and cats. But I also recognize that there are people out there who just don\u2019t like animals. When I saw this story of how much one woman disliked her boyfriend\u2019s dog, I knew that it was worth sharing. I saw this story on Reddit. User Getzen decided that, after four years together, it was finally time to move in with his girlfriend. He just never realized that his girlfriend hated his dog Molly so much. Getzen\u2019s girlfriend gave him an ultimatum and demanded that he get rid of Molly right away. After thinking about it, Getzen put up an ad.',
+    'FREE TO ANY WILLING HOME\nMy girlfriend does not like my beagle Molly. So I have to re-home her. She is a pure-bred from a wealthy area and I have had her 4 years. She likes to play games. Not totally trained. Has long hair so she\u2019s a little high maintenance, especially the nails, but she loves having them done. Stays up all night yapping but sleeps while I work. Only eats the best, most expensive food. Will NEVER greet you at the door after a long day or give you unconditional love when you\u2019re down. Does not bite but she can be mean as hell!\nSo\u2026 anyone interested in my 30-year-old, selfish, wicked, gold-digging girlfriend? Come and get her! Me and my dog want her re-homed ASAP!'],
+   questions:[
+    {id:'q22',num:'Vraag 22',pts:1,type:'mc',text:'What is the writer\u2019s main purpose in paragraph 1?',paraRef:1,strat:'skim',opts:['A \u2014 to explain why a man wanted to advertise online','B \u2014 to illustrate how much a girl hates dogs','C \u2014 to introduce an ad he has read','D \u2014 to show that he really likes pets'],correct:2,fb:'The narrator introduces the Reddit ad by explaining the context \u2014 C is correct.'},
+    {id:'q23',num:'Vraag 23',pts:1,type:'mc',text:'Wat is de toon van de advertentie (alinea 2)?',paraRef:2,strat:'skim',opts:['A \u2014 boos','B \u2014 grappig','C \u2014 onverschillig','D \u2014 teleurgesteld'],correct:1,fb:'De advertentie beschrijft de vriendin met humor alsof het een hond is \u2014 de toon is grappig (B).'}
+   ]},
+  {id:10,pt:'Tekst 8',title:'Adventure at a Waterfall',source:'Washington Post, 2019',
+   paras:['Curtis Whitson felt sick to his stomach when he realized that he, his girlfriend and his 13-year-old son were suddenly stranded on an isolated stretch of California\u2019s Arroyo Seco tributary. They had reached the most difficult part of their four-day floating and camping trip over the summer, and they were trapped atop a raging, 40-foot waterfall. A rope that was supposed to be secured at the top of the waterfall \u2013 the only safe way down \u2013 was missing. There was no way to climb out of the gorge.',
+    'Thoughts raced through Whitson\u2019s mind: Heavy spring rains had likely washed the rope away. There was no other way to get down safely. He had packed a rope in his camping gear, but he estimated that the water was too swift and high to attempt to attach his rope and abseil down. Friends knew they were in Arroyo Seco, but it might be several days before a search party was dispatched. There was no cell service. He desperately needed a plan.',
+    'Whitson looked at his lime-green Nalgene water bottle, and he suddenly had an idea: He scratched \u201cHELP!\u201d on each side of the bottle and scribbled an SOS note on a piece of paper with the date, June 15, and their whereabouts \u2013 then tucked it inside. He tossed the bottle over the waterfall and silently begged the universe for somebody downstream to find it.',
+    'It was a very long shot. \u201cWe\u2019ve done all we can do,\u201d he recalled telling his girlfriend and son after he dropped the bottle over the edge. \u201cThe only thing left to do now is wait.\u201d Remarkably, they didn\u2019t have to wait long. About midnight, they were awakened by a voice from a loudspeaker: \u201cThis is search and rescue \u2013 you have been found! Stay put and we\u2019ll be back to get you tomorrow morning.\u201d Whitson could barely believe that his message in a bottle was discovered within hours of tossing it over the waterfall.',
+    'The three of them later found out that about a quarter-mile downstream, two hikers had spotted the bright green bottle right away, read the note and hiked to the Arroyo Seco Campground to alert the manager to call a search and rescue team. Although it was growing too dark for a rescue operation, a California Highway Patrol helicopter pilot decided to do a flyover with his crew before the end of their shift. Using night vision goggles and infrared technology to detect heat from a campfire, they were able to spot the stranded trio. The next morning, a second California Highway Patrol helicopter crew arrived at 10 a.m. to lift each of them to safety.'],
+   questions:[
+    {id:'q24',num:'Vraag 24',pts:1,type:'mc',text:'What happened to Curtis Whitson and his family during their camping trip according to paragraph 1?',paraRef:1,strat:'skim',opts:['A \u2014 They fell ill.','B \u2014 They got stuck.','C \u2014 They lost their way.','D \u2014 They were injured.'],correct:1,fb:'\u201cTrapped atop a raging, 40-foot waterfall\u201d \u2014 they got stuck (B).'},
+    {id:'q25',num:'Vraag 25',pts:1,type:'mc',text:'How does paragraph 2 connect to paragraph 1?',paraRef:null,strat:'skim',opts:['A \u2014 It contradicts the point made in paragraph 1.','B \u2014 It further explains the point made in paragraph 1.','C \u2014 It summarises the point made in paragraph 1.'],correct:1,fb:'Paragraph 2 lists all the reasons why escaping was so difficult \u2014 it further explains the problem from paragraph 1.'},
+    {id:'q26',num:'Vraag 26',pts:1,type:'mc',text:'Why couldn\u2019t the family be rescued straight after they were found according to paragraph 5?',paraRef:5,strat:'scan',opts:['A \u2014 because of bad weather conditions','B \u2014 because the rescue team didn\u2019t have the right equipment','C \u2014 because there was not enough light to do it safely','D \u2014 because there was only one helicopter available'],correct:2,fb:'\u201cIt was growing too dark for a rescue operation\u201d \u2014 C is correct.'},
+    {id:'q27',num:'Vraag 27',pts:2,type:'open',text:'Geef van elke bewering aan of die WEL of NIET wordt genoemd in alinea 3 en/of 4. Antwoord in het Nederlands.\n1. Curtis Whitson en zijn gezin werden wakker van het reddingsteam.\n2. Curtis Whitson had opgeschreven waar hij en zijn gezin gestrand waren.\n3. De vriendin van Curtis Whitson vond zijn plan een goed idee.\n4. Het reddingsteam had moeite om hen te vinden.',paraRef:null,strat:'key',modelAnswer:'<strong>1 WEL</strong> \u2013 Ze werden wakker van het geluid van de megafoon (alinea 4).<br><strong>2 WEL</strong> \u2013 Hij schreef de datum en hun locatie op het briefje (alinea 3).<br><strong>3 NIET</strong> \u2013 De reactie van de vriendin wordt niet genoemd.<br><strong>4 NIET</strong> \u2013 Ze werden juist snel gevonden.'}
+   ]},
+  {id:11,pt:'Tekst 10',title:'Plane Madness',source:'dailymail.co.uk, 2016',
+   paras:['He has always been willing to go the extra mile to save money \u2013 but this time he went 1,017 miles. Jordon Cox, 18, was so shocked by the cost of a train ticket from Sheffield to his home in Shenfield, Essex, that he decided to see if flying was cheaper. After ransacking the internet for a deal, he flew from East Midlands Airport to Stansted via Berlin and still saved cash, despite spending his seven hour layover on a super quick tour of the German capital feasting on currywurst. This extreme option may not be for everyone. Jordon\u2019s journey took 13 hours door-to-door, while a train trip would have been just three-and-a-half.',
+    'Jordon, who blogs on how to save money, was dubbed The Coupon Kid by friends when he started saving money by using vouchers. He once got \u00a3600 of groceries for 4p. On the day of his Berlin trip, he had travelled from Shenfield to Sheffield by train to teach a class on couponing. The teenager had managed to book a cheap \u00a319 ticket for the journey north. But when he discovered the cheapest fare back home was \u00a347, he looked for alternatives. An open return from Shenfield to Sheffield would have set him back \u00a397.70. He discovered he could fly home via Milan, Copenhagen, Dublin or Berlin with Ryanair and it would be cheaper than a single train journey in England.',
+    '\u2018Even by my usual standards, I\u2019ll admit this is a rather extreme way of saving money,\u2019 he said. \u2018In the end I chose to travel via Berlin as it was the cheapest and the furthest away so I would get my money\u2019s worth. It is also a city on my bucket list that I have never been to before, so to have a short holiday there for less than the price of my train fare was brilliant. I know that flying is not environmentally friendly and I won\u2019t do this every time I travel, but this was the cheapest way for me to get home and I got to enjoy a \u2018free\u2019 mini holiday to a city I\u2019ve always wanted to visit.\u2019',
+    'Jordon, who blogs for MoneySavingExpert.com, booked his flight around three weeks in advance. Jordon\u2019s extraordinary talent as a bargain hunter first hit the headlines in 2013 when it emerged he had bought his mother more than \u00a3100 of groceries for almost \u00a3100 off. He began by holding seminars at his local theatre in Brentwood, Essex, to give adults tips on how to save hundreds of pounds on day-to-day purchases.',
+    'And though his single-minded pursuit of a bargain may seem a little unusual, Jordon originally did it to help his mum. She was struggling to make ends meet after a divorce. Though Jordon\u2019s father helped with the mortgage, bills had become problematic. At the time, Debbie said: \u2018When my husband and I separated I was panicking. I didn\u2019t know how I\u2019d cope financially. When Jordon mentioned couponing I was a bit sceptical. But he\u2019s made some incredible savings and it\u2019s really improved our lives. We had been spending around \u00a3120 a week before my husband left and now we\u2019re down to just \u00a310.\u2019'],
+   questions:[
+    {id:'q28',num:'Vraag 28',pts:1,type:'mc',text:'What becomes clear about Jordon Cox in paragraph 1?',paraRef:1,strat:'skim',opts:['A \u2014 He preferred flying because it was faster.','B \u2014 He wanted to travel to Germany by train.','C \u2014 He was prepared to travel a long way to save some cash.','D \u2014 He was unable to leave Berlin after his trip.'],correct:2,fb:'He flew via Berlin to save money even though it took 13 hours instead of 3.5 \u2014 C is correct.'},
+    {id:'q29',num:'Vraag 29',pts:1,type:'mc',text:'What is true about Jordon according to paragraph 4?',paraRef:4,strat:'key',opts:['A \u2014 He learned everything about saving money from his mother.','B \u2014 He mainly focuses on local supermarkets.','C \u2014 He makes his living by advising other people on how to save money.','D \u2014 He wanted to save money because he needed more pocket money.'],correct:2,fb:'He holds seminars and blogs for MoneySavingExpert.com \u2014 C is correct.'},
+    {id:'q30',num:'Vraag 30',pts:1,type:'mc',text:'What becomes clear from paragraph 5?',paraRef:5,strat:'key',opts:['A \u2014 Jordon started saving money after his parents split up.','B \u2014 Jordon\u2019s father was unable to support the family financially.','C \u2014 Jordon\u2019s mother blamed her ex-partner for her financial struggles.','D \u2014 Jordon\u2019s mother came up with the idea of couponing when she lost her job.'],correct:0,fb:'His parents\u2019 divorce caused financial problems \u2014 that\u2019s when Jordon started saving (A).'}
+   ]},
+  {id:12,pt:'Tekst 12',title:'BMW',source:'abc.net.au, 2019',
+   paras:['A BMW was retrieved from a river in the district of Yamunanagar, India, with a team of local police using ropes and a rubber boat to reach the partially submerged vehicle.',
+    'The police say a 22-year-old man received a BMW from his parents as a birthday present. According to local media, the man\u2019s father is a wealthy landlord and the 22-year-old son already owned several SUVs. The son apparently had demanded a new Jaguar for his birthday and was unimpressed with the BMW, which he thought was too small. In an apparent protest against his parents\u2019 refusal to buy him a Jaguar, he decided to push his brand-new BMW into a river.',
+    'Local police say the man filmed himself while pushing the car in the water and sent the video to his parents. Hundreds of local men watched the recovery effort from the riverbank as heavy machinery was brought in to retrieve the car.',
+    'Directly after the incident, the young man\u2019s father told local media that his son had in fact not driven the car into the river intentionally but had swerved to avoid an antelope on the road.'],
+   questions:[
+    {id:'q31',num:'Vraag 31',pts:1,type:'mc',text:'What is pointed out about a 22-year-old man from India?',paraRef:null,strat:'skim',opts:['A \u2014 He caused a car crash with his new car.','B \u2014 He got pulled over while driving his new car.','C \u2014 He was ungrateful for the new car he got.'],correct:2,fb:'He pushed a brand-new BMW into a river because it wasn\u2019t the Jaguar he wanted \u2014 C is correct.'},
+    {id:'q32',num:'Vraag 32',pts:1,type:'mc',text:"What did the young man's father claim happened to the car? (paragraph 4)",paraRef:4,strat:'scan',opts:['A \u2014 His son pushed it into the river on purpose.','B \u2014 His son accidentally drove it into the river to avoid an animal.','C \u2014 His son sold the car to someone else.','D \u2014 His son crashed it while driving too fast.'],correct:1,fb:'\u201cHad swerved to avoid an antelope on the road\u201d \u2014 the father claimed it was an accident (B).'}
+   ]},
+  {id:13,pt:'Tekst 13',title:'Message in a Bottle',source:'people.com, 2019',
+   paras:['Max Vredenburgh was just 10 years old when he placed a letter inside of an empty wine bottle and threw it into the ocean on August 21, ten years ago. The letter was short and sweet, and in it, Vredenburgh talked about the things he liked at the time, such as his favorite color and what he liked to eat. After so much time had passed, Vredenburgh likely never expected to get a response back. That\u2019s why Vredenburgh was so surprised last month when he received a letter addressed to him from a stranger in Europe. In the letter, the sender \u2013 a man named G. Dubois \u2013 said he discovered Vredenburgh\u2019s letter in a bottle along the coast of France, thousands of miles from where it had been tossed in the water. \u201cMy wish from when I was a 10-year-old just came true. Logistically, I think I have a higher chance of winning the lottery than this happening,\u201d Vredenburgh said of the once in a lifetime occurrence. A news station said Vredenburgh and Dubois have now contacted each other on Instagram.'],
+   questions:[
+    {id:'q33',num:'Vraag 33',pts:1,type:'mc',text:'What becomes clear about Max Vredenburgh?',paraRef:null,strat:'key',opts:['A \u2014 He finally met his French pen pal after years of writing letters.','B \u2014 He found a letter on the beach when he was a boy.','C \u2014 He hopes to keep in touch with the finder of his letter.','D \u2014 He was amazed he got a reply to his letter after so many years.'],correct:3,fb:'He compared it to winning the lottery and called it a \u201conce in a lifetime occurrence\u201d \u2014 D is correct.'}
+   ]}
+];
+
+// Strategy tips shown AFTER answering
+const STIP={
+  skim:{label:'&#128064; Skimmen',tip:'Skimmen werkt hier goed: lees de eerste zin van elke alinea om snel het hoofdidee te vinden.'},
+  scan:{label:'&#127919; Scannen',tip:'Scannen is hier handig: zoek gericht &#233;&#233;n sleutelwoord of getal in de tekst.'},
+  key:{label:'&#128273; Sleutelwoorden',tip:'Sleutelwoorden aanpakken: onderstreep het kernwoord uit de vraag en zoek dat (of een synoniem) terug in de tekst.'},
+  elim:{label:'&#10060; Elimineren',tip:'Elimineren helpt hier: streep de duidelijk foute opties weg en kies uit wat overblijft.'}
+};
+
+let S={};
+
+function initState(){
+  S={page:0,correct:0,wrong:0,openDone:0,qs:{}};
+  TEXTS.forEach(t=>t.questions.forEach(q=>{
+    S.qs[q.id]={pred:null,ans:null,ok:null,modelShown:false};
+  }));
+}
+
+// ── SCREENS ──────────────────────────────────────────
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startQuiz(){
+  initState();
+  buildPages();
+  buildTabs();
+  show('s-pred-0');
+  S.page=0;
+  updateTabs();
+}
+
+function getReadSecs(text){
+  const n=text.paras.length;
+  if(n<=2)return 25;
+  return 40;
+}
+
+function startReadTimer(ti){
+  const secs=getReadSecs(TEXTS[ti]);
+  let rem=secs;
+  const fill=document.getElementById('tfill'+ti);
+  const msg=document.getElementById('tmsg'+ti);
+  const sec=document.getElementById('tsec'+ti);
+  const bar=document.getElementById('tbar'+ti);
+  // Start with full bar, shrink each second
+  fill.style.transition='none';
+  fill.style.width='100%';
+  setTimeout(()=>{
+    fill.style.transition='width 1s linear';
+    fill.style.width=((rem-1)/secs*100)+'%';
+  },50);
+  const iv=setInterval(()=>{
+    rem--;
+    sec.textContent=rem;
+    fill.style.width=(rem/secs*100)+'%';
+    if(rem<=0){
+      clearInterval(iv);
+      bar.classList.add('done');
+      msg.innerHTML='&#10003; Leestijd voorbij &mdash; antwoorden zijn nu actief.';
+      // Unlock all answer/open blocks
+      TEXTS[ti].questions.forEach(q=>{
+        document.getElementById('ab'+ti+'x'+q.id)?.classList.remove('timed');
+        document.getElementById('ob'+ti+'x'+q.id)?.classList.remove('timed');
+      });
+    }
+  },1000);
+}
+
+function goToAns(ti){
+  // Fill prediction recap
+  TEXTS[ti].questions.forEach(q=>{
+    if(q.type!=='mc')return;
+    const recap=document.getElementById('recap'+ti+'x'+q.id);
+    if(recap){
+      const ltr=String.fromCharCode(65+S.qs[q.id].pred);
+      recap.innerHTML=`<div class="pred-recap-text">&#63; Jouw voorspelling: <strong>${ltr} &mdash; ${q.opts[S.qs[q.id].pred]}</strong></div>`;
+    }
+    // Lock answer block until timer expires
+    document.getElementById('ab'+ti+'x'+q.id)?.classList.add('timed');
+  });
+  // Lock open blocks too
+  TEXTS[ti].questions.filter(q=>q.type==='open').forEach(q=>{
+    document.getElementById('ob'+ti+'x'+q.id)?.classList.add('timed');
+  });
+  show('s-ans-'+ti);
+  startReadTimer(ti);
+}
+
+function nextText(ti){
+  const ni=ti+1;
+  if(ni>=TEXTS.length){show('s-results');showResults();return;}
+  S.page=ni;
+  show('s-pred-'+ni);
+  updateTabs();
+}
+
+// ── BUILD ─────────────────────────────────────────────
+function buildPages(){
+  const container=document.getElementById('pages');
+  container.innerHTML='';
+  TEXTS.forEach((text,ti)=>{
+
+    // sidebar dots - pred screen uses pdP prefix
+    const pdotsPred=TEXTS.map((t,i)=>
+      `<div class="pdot-row"><div class="p-dot${i===ti?' cur':''}">${i+1}</div><div class="pdot-lbl${i===ti?' cur':''}">${t.pt} &mdash; ${t.title}</div></div>`
+    ).join('');
+    // sidebar dots - ans screen uses pdA prefix, these get updated by checkPageDone
+    const pdotsAns=TEXTS.map((t,i)=>
+      `<div class="pdot-row"><div class="p-dot${i===ti?' cur':''}" id="pdA${ti}x${i}">${i+1}</div><div class="pdot-lbl${i===ti?' cur':''}" id="pdAlbl${ti}x${i}">${t.pt} &mdash; ${t.title}</div></div>`
+    ).join('');
+    let gi=0; // reset per page for consistent numbering
+    // compute global start index for this text
+    let globalStart=0;
+    for(let i=0;i<ti;i++) globalStart+=TEXTS[i].questions.length;
+
+    const stratList=`<div class="cheat-list">
+      <div class="cheat-row"><span class="cheat-icon">&#128064;</span><div><strong>Skimmen</strong><span>Eerste zin per alinea = hoofdidee.</span></div></div>
+      <div class="cheat-row"><span class="cheat-icon">&#127919;</span><div><strong>Scannen</strong><span>Zoek gericht 1 woord of getal.</span></div></div>
+      <div class="cheat-row"><span class="cheat-icon">&#128273;</span><div><strong>Sleutelwoorden</strong><span>Kernwoord uit vraag zoeken in tekst.</span></div></div>
+      <div class="cheat-row"><span class="cheat-icon">&#10060;</span><div><strong>Elimineren</strong><span>Foute opties wegstrepen, kies uit rest.</span></div></div>
+      <div class="cheat-row"><span class="cheat-icon">&#128172;</span><div><strong>Open vragen</strong><span>Nederlands. 2p = 2 dingen noemen.</span></div></div>
+    </div>`;
+
+    // Sidebar A (pred screen) — no updateable IDs needed
+    let qiA=0;
+    const sidebarA=`<div class="sidebar">
+      <div class="side-card"><div class="side-hdr">Pagina ${ti+1} / ${TEXTS.length}</div>
+        <div class="side-body"><div class="page-dots">${pdotsPred}</div></div></div>
+      <div class="side-card"><div class="side-hdr">Alle vragen</div>
+        <div class="side-body"><div class="q-dots">${TEXTS.flatMap(t=>t.questions.map(q=>`<div class="q-dot">${++qiA}</div>`)).join('')}</div>
+        <div style="margin-top:.5rem;font-size:.7rem;color:var(--muted)"><span style="color:var(--correct)">&#9632;</span> goed &nbsp;<span style="color:var(--wrong)">&#9632;</span> fout &nbsp;<span style="color:var(--gold)">&#9632;</span> open</div></div></div>
+      <div class="side-card"><div class="side-hdr">Leesstrategieën</div><div class="side-body">${stratList}</div></div>
+    </div>`;
+
+    // Sidebar B (ans screen) — IDs used by updDot and checkPageDone
+    let qiB=0;
+    const sidebarB=`<div class="sidebar">
+      <div class="side-card"><div class="side-hdr">Pagina ${ti+1} / ${TEXTS.length}</div>
+        <div class="side-body"><div class="page-dots">${pdotsAns}</div></div></div>
+      <div class="side-card"><div class="side-hdr">Alle vragen</div>
+        <div class="side-body"><div class="q-dots">${TEXTS.flatMap(t=>t.questions.map(q=>`<div class="q-dot" id="qd${ti}x${q.id}">${++qiB}</div>`)).join('')}</div>
+        <div style="margin-top:.5rem;font-size:.7rem;color:var(--muted)"><span style="color:var(--correct)">&#9632;</span> goed &nbsp;<span style="color:var(--wrong)">&#9632;</span> fout &nbsp;<span style="color:var(--gold)">&#9632;</span> open</div></div></div>
+      <div class="side-card"><div class="side-hdr">Leesstrategieën</div><div class="side-body">${stratList}</div></div>
+    </div>`;
+
+    // ── SCREEN A: Prediction only ──────────────────────
+    const scrA=document.createElement('div');
+    scrA.className='screen'; scrA.id='s-pred-'+ti;
+    const predCards=text.questions.map(q=>{
+      if(q.type==='open'){
+        // open questions shown on screen B only — show placeholder here
+        return `<div class="q-card res-o">
+          <div class="q-hdr">
+            <div><div class="q-badge">${q.num}</div><div class="q-pts">${q.pts} punt${q.pts>1?'en':''}</div></div>
+            <div class="q-txt">${q.text.replace(/\n/g,'<br>')}</div>
+          </div>
+          <div class="open-placeholder">&#128218; Open vraag &mdash; beantwoord na het lezen op de volgende pagina.</div>
+        </div>`;
+      }
+      const predOpts=q.opts.map((o,i)=>
+        `<button class="pred-btn" onclick="predict('${q.id}',${ti},${i})">
+          <span class="pred-ltr">${String.fromCharCode(65+i)}</span><span>${o}</span>
+        </button>`
+      ).join('');
+      return `<div class="q-card" id="qcA${ti}x${q.id}">
+        <div class="q-hdr">
+          <div><div class="q-badge">${q.num}</div><div class="q-pts">${q.pts} punt${q.pts>1?'en':''}</div></div>
+          <div class="q-txt">${q.text}</div>
+        </div>
+        <div class="pred-block" id="pr${ti}x${q.id}">
+          <div class="pred-label">&#63; Jouw voorspelling &mdash; zonder de tekst te lezen</div>
+          <div class="pred-opts">${predOpts}</div>
+        </div>
+      </div>`;
+    }).join('');
+    scrA.innerHTML=`<div class="page-layout">
+      <div class="col-left">
+        <div class="phase-banner pred">
+          <strong>${text.pt} &mdash; ${text.title}</strong><br>
+          Stap 1: Lees de vragen en klik bij elke meerkeuze-vraag je voorspelling aan. De tekst zie je daarna.
+        </div>
+        ${predCards}
+        <div class="page-nav">
+          <div class="page-nav-info" id="niA${ti}">Klik bij alle meerkeuze-vragen een voorspelling aan.</div>
+          <button class="btn-next" id="nbA${ti}" disabled onclick="goToAns(${ti})">Lees de tekst &#8594;</button>
+        </div>
+      </div>
+      ${sidebarA}
+    </div>`;
+    container.appendChild(scrA);
+
+    // ── SCREEN B: Text + definitive answers ───────────
+    const scrB=document.createElement('div');
+    scrB.className='screen'; scrB.id='s-ans-'+ti;
+    const ansCards=text.questions.map(q=>buildAnsCard(q,ti)).join('');
+    scrB.innerHTML=`<div class="page-layout">
+      <div class="col-left">
+        <div class="phase-banner ans">
+          <strong>${text.pt} &mdash; ${text.title}</strong><br>
+          Stap 2: Lees de tekst eerst goed. De antwoorden worden na de timer actief.
+        </div>
+        <div class="text-card">
+          <div class="tc-hdr">
+            <span class="tc-title">${text.pt} &mdash; ${text.title}</span>
+            <span class="tc-src">${text.source}</span>
+          </div>
+          <div class="timer-bar-wrap" id="tbar${ti}">
+            <div class="timer-track"><div class="timer-fill" id="tfill${ti}"></div></div>
+            <div class="timer-msg" id="tmsg${ti}">Leestijd: <strong id="tsec${ti}">${getReadSecs(text)}</strong>s</div>
+          </div>
+          <div class="text-body">${text.paras.map((p,i)=>`<p><span class="p-num">${i+1}</span>${p}</p>`).join('')}</div>
+        </div>
+        ${ansCards}
+        <div class="page-nav">
+          <div class="page-nav-info" id="niB${ti}">Beantwoord alle vragen om verder te gaan.</div>
+          <button class="btn-next" id="nbB${ti}" disabled onclick="nextText(${ti})">${ti<TEXTS.length-1?'Volgende tekst &#8594;':'Bekijk resultaten &#8594;'}</button>
+        </div>
+      </div>
+      ${sidebarB}
+    </div>`;
+    container.appendChild(scrB);
+  });
+}
+
+function buildAnsCard(q,ti){
+  if(q.type==='open'){
+    return `<div class="q-card res-o" id="qcB${ti}x${q.id}">
+      <div class="q-hdr">
+        <div><div class="q-badge">${q.num}</div><div class="q-pts">${q.pts} punt${q.pts>1?'en':''}</div></div>
+        <div class="q-txt">${q.text.replace(/\n/g,'<br>')}</div>
+      </div>
+      <div class="open-block" id="ob${ti}x${q.id}">
+        <div class="open-label">Jouw antwoord (Nederlands)</div>
+        <textarea class="open-ta" placeholder="Schrijf je antwoord hier..."></textarea>
+        <button class="reveal-btn" onclick="revealOpen('${q.id}',${ti})">Toon modelantwoord</button>
+        <div class="model-box" id="mb${ti}x${q.id}">${q.modelAnswer||''}</div>
+        <div class="strat-tip-open" id="sto${ti}x${q.id}"></div>
+      </div>
+    </div>`;
+  }
+  const ansOpts=q.opts.map((o,i)=>
+    `<button class="ans-btn" onclick="answer('${q.id}',${ti},${i})">
+      <span class="ans-ltr">${String.fromCharCode(65+i)}</span><span>${o}</span>
+    </button>`
+  ).join('');
+  return `<div class="q-card" id="qcB${ti}x${q.id}">
+    <div class="q-hdr">
+      <div><div class="q-badge">${q.num}</div><div class="q-pts">${q.pts} punt${q.pts>1?'en':''}</div></div>
+      <div class="q-txt">${q.text}</div>
+    </div>
+    <div class="pred-recap" id="recap${ti}x${q.id}"></div>
+    <div class="ans-block" id="ab${ti}x${q.id}">
+      <div class="ans-label">&#10003; Definitief antwoord</div>
+      <div class="ans-opts">${ansOpts}</div>
+    </div>
+    <div class="fb-block" id="fb${ti}x${q.id}">
+      <div class="fb-result" id="fr${ti}x${q.id}"></div>
+      <div class="strat-tip-box" id="st${ti}x${q.id}"></div>
+    </div>
+  </div>`;
+}
+
+function buildTabs(){
+  const t=document.getElementById('tabs');
+  t.innerHTML=TEXTS.map((tx,i)=>
+    `<div class="tab-item" id="tab${i}"><div class="tab-dot" id="tabdot${i}"></div>${tx.pt}</div>`
+  ).join('<span class="tab-sep">&#8250;</span>');
+}
+
+// ── INTERACTIONS ──────────────────────────────────────
+function predict(qId,ti,chosen){
+  const qs=S.qs[qId];
+  if(qs.pred!==null)return;
+  qs.pred=chosen;
+
+  // Mark prediction visually
+  const pr=document.getElementById('pr'+ti+'x'+qId);
+  pr.querySelectorAll('.pred-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===chosen)b.classList.add('picked');
+  });
+  const card=document.getElementById('qcA'+ti+'x'+qId);
+  if(card)card.classList.add('pred-done');
+
+  // Check if all MC on this page predicted → enable "Lees de tekst" button
+  const mcQs=TEXTS[ti].questions.filter(q=>q.type==='mc');
+  if(mcQs.every(q=>S.qs[q.id].pred!==null)){
+    const btn=document.getElementById('nbA'+ti);
+    const info=document.getElementById('niA'+ti);
+    if(btn)btn.disabled=false;
+    if(info)info.textContent='&#10003; Alle voorspellingen gedaan \u2014 ga nu de tekst lezen!';
+  }
+}
+
+function answer(qId,ti,chosen){
+  const qs=S.qs[qId];
+  if(qs.ans!==null)return;
+  const q=findQ(qId);
+  if(!q){console.error('findQ returned null for',qId);return;}
+  const ok=chosen===q.correct;
+  qs.ans=chosen; qs.ok=ok;
+  if(ok)S.correct++; else S.wrong++;
+
+  // Style answer buttons
+  const ab=document.getElementById('ab'+ti+'x'+qId);
+  if(!ab){console.error('ab not found',ti,qId);return;}
+  ab.querySelectorAll('.ans-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.correct)b.classList.add('correct');
+    else if(i===chosen&&!ok)b.classList.add('wrong');
+  });
+  ab.classList.add('done');
+
+  // Card border
+  document.getElementById('qcB'+ti+'x'+qId)?.classList.add(ok?'res-c':'res-w');
+
+  // Feedback + strategy tip
+  const fb=document.getElementById('fb'+ti+'x'+qId);
+  const fr=document.getElementById('fr'+ti+'x'+qId);
+  const st=document.getElementById('st'+ti+'x'+qId);
+  if(!fb||!fr||!st){
+    console.error('fb/fr/st not found',ti,qId,!!fb,!!fr,!!st);
+    // Still register the answer and check page done even if UI elements missing
+    updDot(qId,ti,ok?'c':'w');
+    updateProg();
+    checkPageDone(ti);
+    return;
+  }
+  const predWasRight=qs.pred===q.correct;
+  const predTxt=qs.pred!==null?String.fromCharCode(65+qs.pred):'?';
+  const predNote=predWasRight?' <em>(voorspelling klopte!)</em>':' <em>(voorspelling: '+predTxt+')</em>';
+  fr.innerHTML=(ok?'&#10003; Correct! ':'&#10007; Helaas. ')+q.fb+predNote;
+  fr.className='fb-result '+(ok?'correct':'wrong');
+  const tip=STIP[q.strat]||STIP['key'];
+  st.innerHTML='<strong>Leesstrategie tip &mdash; '+tip.label+':</strong> '+tip.tip;
+  fb.classList.add('show');
+
+  // Q dot
+  updDot(qId,ti,ok?'c':'w');
+  updateProg();
+  checkPageDone(ti);
+}
+
+function revealOpen(qId,ti){
+  const qs=S.qs[qId];
+  if(qs.modelShown)return;
+  qs.modelShown=true;
+  S.openDone++;
+  const mb=document.getElementById('mb'+ti+'x'+qId);
+  mb.classList.add('show');
+  const ob=document.getElementById('ob'+ti+'x'+qId);
+  const rb=ob.querySelector('.reveal-btn');
+  if(rb)rb.remove();
+  const ta=ob.querySelector('.open-ta');
+  if(ta)ta.disabled=true;
+  // Show strategy tip
+  const q=findQ(qId);
+  const tip=STIP[q.strat];
+  const sto=document.getElementById('sto'+ti+'x'+qId);
+  sto.innerHTML='<strong>Leesstrategie tip &mdash; '+tip.label+':</strong> '+tip.tip;
+  sto.classList.add('show');
+  updDot(qId,ti,'o');
+  updateProg();
+  checkPageDone(ti);
+}
+
+function checkPageDone(ti){
+  const text=TEXTS[ti];
+  let total=0, done=0;
+  text.questions.forEach(q=>{
+    total++;
+    const qs=S.qs[q.id];
+    if(q.type==='mc' && qs && qs.ans!==null) done++;
+    if(q.type==='open' && qs && qs.modelShown) done++;
+  });
+  console.log('checkPageDone ti='+ti+' done='+done+'/'+total, JSON.stringify(S.qs));
+  if(done<total)return;
+  const nb=document.getElementById('nbB'+ti);
+  const ni=document.getElementById('niB'+ti);
+  if(nb)nb.disabled=false;
+  if(ni)ni.textContent='\u2713 Alle vragen klaar \u2014 ga verder!';
+  TEXTS.forEach((_,j)=>{
+    const d=document.getElementById('pdA'+j+'x'+ti);
+    if(d){d.classList.remove('cur');d.classList.add('done');}
+    const lbl=document.getElementById('pdAlbl'+j+'x'+ti);
+    if(lbl){lbl.classList.remove('cur');lbl.classList.add('done');}
+  });
+  updateTabs();
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function findQ(qId){for(const t of TEXTS){const q=t.questions.find(q=>q.id===qId);if(q)return q;}}
+
+function updDot(qId,ti,cls){
+  TEXTS.forEach((_,j)=>{
+    const el=document.getElementById('qd'+j+'x'+qId);
+    if(el)el.className='q-dot '+cls;
+  });
+}
+
+function updateProg(){
+  const total=TEXTS.flatMap(t=>t.questions).length;
+  const done=Object.values(S.qs).filter(q=>q.ans!==null||q.modelShown).length;
+  document.getElementById('prog').style.width=(done/total*100)+'%';
+  document.getElementById('hdr-c').textContent=S.correct;
+  document.getElementById('hdr-w').textContent=S.wrong;
+}
+
+function updateTabs(){
+  TEXTS.forEach((_,i)=>{
+    const tab=document.getElementById('tab'+i);
+    const dot=document.getElementById('tabdot'+i);
+    if(!tab)return;
+    tab.className='tab-item';
+    dot.style.background='var(--rule)';
+    if(i===S.page){tab.classList.add('active');dot.style.background='var(--accent)';}
+    else if(pageDone(i)){tab.classList.add('completed');dot.style.background='var(--correct)';}
+  });
+}
+
+function pageDone(ti){
+  return TEXTS[ti].questions.every(q=>{
+    const qs=S.qs[q.id];
+    return q.type==='mc'?qs.ans!==null:qs.modelShown;
+  });
+}
+
+// ── RESULTS ───────────────────────────────────────────
+function showResults(){
+  const mcTotal=TEXTS.flatMap(t=>t.questions).filter(q=>q.type==='mc').length;
+  const pct=S.correct/mcTotal;
+  document.getElementById('r-emoji').innerHTML=pct>=.8?'&#127942;':pct>=.6?'&#128077;':'&#128170;';
+  document.getElementById('r-score').textContent=S.correct+'/'+mcTotal;
+  document.getElementById('r-sub').textContent=(pct>=.8?'Uitstekend! Je aanpak werkt goed.':pct>=.6?'Goed bezig! Let op de leesstrategietips bij de foute antwoorden.':'Bekijk de tips en probeer het opnieuw.')+(S.openDone?'  Open vragen tellen niet mee in de score.':'')+'';
+  document.getElementById('r-c').textContent=S.correct;
+  document.getElementById('r-w').textContent=S.wrong;
+  document.getElementById('r-o').textContent=S.openDone;
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('tabs').innerHTML='';
+}
+
+function restart(){
+  show('s-intro');
+  document.getElementById('prog').style.width='0%';
+  document.getElementById('hdr-c').textContent='0';
+  document.getElementById('hdr-w').textContent='0';
+  document.getElementById('tabs').innerHTML='';
+}
+</script>
+</body>
+</html>
