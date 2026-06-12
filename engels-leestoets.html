@@ -468,6 +468,26 @@ function prevText(ti){
   updateTabs();
 }
 
+function goToPage(pageIndex){
+  // Check if page is already done or being answered
+  const text=TEXTS[pageIndex];
+  const allDone=text.questions.every(q=>{
+    const qs=S.qs[q.id];
+    return q.type==='mc'?qs.ans!==null:qs.modelShown;
+  });
+
+  // If page not started or in progress, show prediction screen
+  const anyAnswered=text.questions.some(q=>S.qs[q.id].ans!==null || S.qs[q.id].modelShown);
+
+  S.page=pageIndex;
+  if(anyAnswered){
+    show('s-ans-'+pageIndex);
+  } else {
+    show('s-pred-'+pageIndex);
+  }
+  updateTabs();
+}
+
 // ── BUILD ─────────────────────────────────────────────
 function buildPages(){
   const container=document.getElementById('pages');
@@ -642,7 +662,7 @@ function buildAnsCard(q,ti){
 function buildTabs(){
   const t=document.getElementById('tabs');
   t.innerHTML=TEXTS.map((tx,i)=>
-    `<div class="tab-item" id="tab${i}"><div class="tab-dot" id="tabdot${i}"></div>${tx.pt}</div>`
+    `<div class="tab-item" id="tab${i}" onclick="goToPage(${i})" style="cursor:pointer;"><div class="tab-dot" id="tabdot${i}"></div>${tx.pt}</div>`
   ).join('<span class="tab-sep">&#8250;</span>');
 }
 
