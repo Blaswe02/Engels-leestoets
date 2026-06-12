@@ -460,6 +460,14 @@ function nextText(ti){
   updateTabs();
 }
 
+function prevText(ti){
+  if(ti<=0)return;
+  const pi=ti-1;
+  S.page=pi;
+  show('s-ans-'+pi);
+  updateTabs();
+}
+
 // ── BUILD ─────────────────────────────────────────────
 function buildPages(){
   const container=document.getElementById('pages');
@@ -578,8 +586,13 @@ function buildPages(){
         </div>
         ${ansCards}
         <div class="page-nav">
-          <div class="page-nav-info" id="niB${ti}">Beantwoord alle vragen om verder te gaan.</div>
-          <button class="btn-next" id="nbB${ti}" disabled onclick="nextText(${ti})">${ti<TEXTS.length-1?'Volgende tekst &#8594;':'Bekijk resultaten &#8594;'}</button>
+          <div style="display:flex;gap:1rem;">
+            <button class="btn-next" id="nbPrev${ti}" onclick="prevText(${ti})" ${ti===0?'disabled':''}style="background:var(--muted);flex:1;">&#8592; Vorige tekst</button>
+            <div style="flex:1;text-align:right;">
+              <div class="page-nav-info" id="niB${ti}">Beantwoord alle vragen om verder te gaan.</div>
+              <button class="btn-next" id="nbB${ti}" disabled onclick="nextText(${ti})" style="margin-top:.5rem;">${ti<TEXTS.length-1?'Volgende tekst &#8594;':'Bekijk resultaten &#8594;'}</button>
+            </div>
+          </div>
         </div>
       </div>
       ${sidebarB}
