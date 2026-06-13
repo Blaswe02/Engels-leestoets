@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Engels Leestoets – VMBO KB Oefening</title>
+<title>Engels Examens – VMBO KB 2021-2023</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -203,8 +203,32 @@ header{background:var(--ink);color:var(--paper);padding:0 2rem;height:58px;displ
 <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
 <div class="page-tabs" id="tabs"></div>
 
+<!-- EXAM SELECT -->
+<div class="screen active" id="s-select">
+  <div class="intro-wrap">
+    <div class="intro-card">
+      <h1>Engels Examens<br>2021-2023</h1>
+      <p class="intro-sub">VMBO KB - Oefen met echte examens</p>
+      <div class="wf-steps" style="margin-top:2rem;">
+        <div class="wf-step" style="border:2px solid var(--accent);border-radius:4px;padding:1rem;cursor:pointer;background:rgba(184,92,26,.05);" onclick="selectExam('2023')">
+          <div class="wf-n" style="background:var(--accent);">2023</div>
+          <div class="wf-txt"><strong>Examen 2023</strong><span>13 teksten · 33 vragen · 45 punten</span></div>
+        </div>
+        <div class="wf-step" style="border:2px solid var(--rule);border-radius:4px;padding:1rem;cursor:pointer;" onclick="selectExam('2022')">
+          <div class="wf-n">2022</div>
+          <div class="wf-txt"><strong>Examen 2022</strong><span>14 teksten · 40 vragen · 45 punten</span></div>
+        </div>
+        <div class="wf-step" style="border:2px solid var(--rule);border-radius:4px;padding:1rem;cursor:pointer;" onclick="selectExam('2021')">
+          <div class="wf-n">2021</div>
+          <div class="wf-txt"><strong>Examen 2021</strong><span>13 teksten · 40 vragen · 45 punten</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- INTRO -->
-<div class="screen active" id="s-intro">
+<div class="screen" id="s-intro">
   <div class="intro-wrap">
     <div class="intro-card">
       <h1>Engels Leestoets<br>Oefening</h1>
@@ -241,7 +265,9 @@ header{background:var(--ink);color:var(--paper);padding:0 2rem;height:58px;displ
 </div>
 
 <script>
-const TEXTS=[
+// \u2500\u2500 MULTI-EXAM ARCHITECTURE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const EXAMS={
+  '2023':{year:2023,texts:[
   {id:1,pt:'Tekst 1',title:'Smart Rubbish Bin',source:'dailymail.co.uk, 2019',secs:40,
    paras:['It is one of the most forgotten and painful chores \u2013 taking out the trash. Now, SmartCan, developed by the firm Rezzi, eliminates the need for homeowners to drag their garbage cans to the curb by providing a motorized trash can attachment and corresponding mobile app. Users can set the specific day and time they need their trash to be at the curb for pickup, and the SmartCan attachment will get it there autonomously. Once picked up by collectors, the robotic trash can heads back to its base after having sensed the vertical movement.',
     '\u2018We want to help people eliminate unnecessary chores from their daily lives,\u2019 said Rezzi CEO and SmartCan creator Andrew Murray. \u2018We see an opportunity to take the \u201cInternet of Things\u201d beyond just turning off lights or turning on music, and really help alleviate the burden of the mundane physical tasks that everyone faces.\u2019'],
@@ -360,9 +386,11 @@ const TEXTS=[
    questions:[
     {id:'q33',num:'Vraag 33',pts:1,type:'mc',text:'What becomes clear about Max Vredenburgh?',paraRef:null,strat:'key',opts:['A \u2014 He finally met his French pen pal after years of writing letters.','B \u2014 He found a letter on the beach when he was a boy.','C \u2014 He hopes to keep in touch with the finder of his letter.','D \u2014 He was amazed he got a reply to his letter after so many years.'],correct:3,fb:'He compared it to winning the lottery and called it a \u201conce in a lifetime occurrence\u201d \u2014 D is correct.'}
    ]}
-];
+  ]},
+  '2022':{year:2022,texts:[]},
+  '2021':{year:2021,texts:[]}
+};
 
-// Strategy tips shown AFTER answering
 const STIP={
   skim:{label:'&#128064; Skimmen',tip:'Skimmen werkt hier goed: lees de eerste zin van elke alinea om snel het hoofdidee te vinden.'},
   scan:{label:'&#127919; Scannen',tip:'Scannen is hier handig: zoek gericht &#233;&#233;n sleutelwoord of getal in de tekst.'},
@@ -371,12 +399,25 @@ const STIP={
 };
 
 let S={};
+let currentExam='2023';
 
 function initState(){
+  const texts=EXAMS[currentExam].texts;
   S={page:0,correct:0,wrong:0,openDone:0,qs:{}};
-  TEXTS.forEach(t=>t.questions.forEach(q=>{
+  texts.forEach(t=>t.questions.forEach(q=>{
     S.qs[q.id]={pred:null,ans:null,ok:null,modelShown:false};
   }));
+}
+
+function selectExam(year){
+  currentExam=year;
+  initState();
+  show('s-intro');
+}
+
+function goBackToSelect(){
+  show('s-select');
+  window.scrollTo(0,0);
 }
 
 // ── SCREENS ──────────────────────────────────────────
@@ -402,7 +443,8 @@ function getReadSecs(text){
 }
 
 function startReadTimer(ti){
-  const secs=getReadSecs(TEXTS[ti]);
+  const texts=EXAMS[currentExam].texts;
+  const secs=getReadSecs(texts[ti]);
   let rem=secs;
   const fill=document.getElementById('tfill'+ti);
   const msg=document.getElementById('tmsg'+ti);
@@ -424,7 +466,7 @@ function startReadTimer(ti){
       bar.classList.add('done');
       msg.innerHTML='&#10003; Leestijd voorbij &mdash; antwoorden zijn nu actief.';
       // Unlock all answer/open blocks
-      TEXTS[ti].questions.forEach(q=>{
+      texts[ti].questions.forEach(q=>{
         document.getElementById('ab'+ti+'x'+q.id)?.classList.remove('timed');
         document.getElementById('ob'+ti+'x'+q.id)?.classList.remove('timed');
       });
@@ -433,8 +475,9 @@ function startReadTimer(ti){
 }
 
 function goToAns(ti){
+  const texts=EXAMS[currentExam].texts;
   // Fill prediction recap
-  TEXTS[ti].questions.forEach(q=>{
+  texts[ti].questions.forEach(q=>{
     if(q.type!=='mc')return;
     const recap=document.getElementById('recap'+ti+'x'+q.id);
     if(recap){
@@ -445,7 +488,7 @@ function goToAns(ti){
     document.getElementById('ab'+ti+'x'+q.id)?.classList.add('timed');
   });
   // Lock open blocks too
-  TEXTS[ti].questions.filter(q=>q.type==='open').forEach(q=>{
+  texts[ti].questions.filter(q=>q.type==='open').forEach(q=>{
     document.getElementById('ob'+ti+'x'+q.id)?.classList.add('timed');
   });
   show('s-ans-'+ti);
@@ -453,8 +496,9 @@ function goToAns(ti){
 }
 
 function nextText(ti){
+  const texts=EXAMS[currentExam].texts;
   const ni=ti+1;
-  if(ni>=TEXTS.length){show('s-results');showResults();return;}
+  if(ni>=texts.length){show('s-results');showResults();return;}
   S.page=ni;
   show('s-pred-'+ni);
   updateTabs();
@@ -469,8 +513,9 @@ function prevText(ti){
 }
 
 function goToPage(pageIndex){
+  const texts=EXAMS[currentExam].texts;
   // Check if page is already done or being answered
-  const text=TEXTS[pageIndex];
+  const text=texts[pageIndex];
   const allDone=text.questions.every(q=>{
     const qs=S.qs[q.id];
     return q.type==='mc'?qs.ans!==null:qs.modelShown;
@@ -491,21 +536,22 @@ function goToPage(pageIndex){
 // ── BUILD ─────────────────────────────────────────────
 function buildPages(){
   const container=document.getElementById('pages');
+  const texts=EXAMS[currentExam].texts;
   container.innerHTML='';
-  TEXTS.forEach((text,ti)=>{
+  texts.forEach((text,ti)=>{
 
     // sidebar dots - pred screen uses pdP prefix
-    const pdotsPred=TEXTS.map((t,i)=>
+    const pdotsPred=texts.map((t,i)=>
       `<div class="pdot-row"><div class="p-dot${i===ti?' cur':''}">${i+1}</div><div class="pdot-lbl${i===ti?' cur':''}">${t.pt} &mdash; ${t.title}</div></div>`
     ).join('');
     // sidebar dots - ans screen uses pdA prefix, these get updated by checkPageDone
-    const pdotsAns=TEXTS.map((t,i)=>
+    const pdotsAns=texts.map((t,i)=>
       `<div class="pdot-row"><div class="p-dot${i===ti?' cur':''}" id="pdA${ti}x${i}">${i+1}</div><div class="pdot-lbl${i===ti?' cur':''}" id="pdAlbl${ti}x${i}">${t.pt} &mdash; ${t.title}</div></div>`
     ).join('');
     let gi=0; // reset per page for consistent numbering
     // compute global start index for this text
     let globalStart=0;
-    for(let i=0;i<ti;i++) globalStart+=TEXTS[i].questions.length;
+    for(let i=0;i<ti;i++) globalStart+=texts[i].questions.length;
 
     const stratList=`<div class="cheat-list">
       <div class="cheat-row"><span class="cheat-icon">&#128064;</span><div><strong>Skimmen</strong><span>Eerste zin per alinea = hoofdidee.</span></div></div>
@@ -518,10 +564,10 @@ function buildPages(){
     // Sidebar A (pred screen) — no updateable IDs needed
     let qiA=0;
     const sidebarA=`<div class="sidebar">
-      <div class="side-card"><div class="side-hdr">Pagina ${ti+1} / ${TEXTS.length}</div>
+      <div class="side-card"><div class="side-hdr">Pagina ${ti+1} / ${texts.length}</div>
         <div class="side-body"><div class="page-dots">${pdotsPred}</div></div></div>
       <div class="side-card"><div class="side-hdr">Alle vragen</div>
-        <div class="side-body"><div class="q-dots">${TEXTS.flatMap(t=>t.questions.map(q=>`<div class="q-dot">${++qiA}</div>`)).join('')}</div>
+        <div class="side-body"><div class="q-dots">${texts.flatMap(t=>t.questions.map(q=>`<div class="q-dot">${++qiA}</div>`)).join('')}</div>
         <div style="margin-top:.5rem;font-size:.7rem;color:var(--muted)"><span style="color:var(--correct)">&#9632;</span> goed &nbsp;<span style="color:var(--wrong)">&#9632;</span> fout &nbsp;<span style="color:var(--gold)">&#9632;</span> open</div></div></div>
       <div class="side-card"><div class="side-hdr">Leesstrategieën</div><div class="side-body">${stratList}</div></div>
     </div>`;
@@ -529,10 +575,10 @@ function buildPages(){
     // Sidebar B (ans screen) — IDs used by updDot and checkPageDone
     let qiB=0;
     const sidebarB=`<div class="sidebar">
-      <div class="side-card"><div class="side-hdr">Pagina ${ti+1} / ${TEXTS.length}</div>
+      <div class="side-card"><div class="side-hdr">Pagina ${ti+1} / ${texts.length}</div>
         <div class="side-body"><div class="page-dots">${pdotsAns}</div></div></div>
       <div class="side-card"><div class="side-hdr">Alle vragen</div>
-        <div class="side-body"><div class="q-dots">${TEXTS.flatMap(t=>t.questions.map(q=>`<div class="q-dot" id="qd${ti}x${q.id}">${++qiB}</div>`)).join('')}</div>
+        <div class="side-body"><div class="q-dots">${texts.flatMap(t=>t.questions.map(q=>`<div class="q-dot" id="qd${ti}x${q.id}">${++qiB}</div>`)).join('')}</div>
         <div style="margin-top:.5rem;font-size:.7rem;color:var(--muted)"><span style="color:var(--correct)">&#9632;</span> goed &nbsp;<span style="color:var(--wrong)">&#9632;</span> fout &nbsp;<span style="color:var(--gold)">&#9632;</span> open</div></div></div>
       <div class="side-card"><div class="side-hdr">Leesstrategieën</div><div class="side-body">${stratList}</div></div>
     </div>`;
@@ -610,7 +656,7 @@ function buildPages(){
             <button class="btn-next" id="nbPrev${ti}" onclick="prevText(${ti})" ${ti===0?'disabled':''}style="background:var(--muted);flex:1;">&#8592; Vorige tekst</button>
             <div style="flex:1;text-align:right;">
               <div class="page-nav-info" id="niB${ti}">Beantwoord alle vragen om verder te gaan.</div>
-              <button class="btn-next" id="nbB${ti}" disabled onclick="nextText(${ti})" style="margin-top:.5rem;">${ti<TEXTS.length-1?'Volgende tekst &#8594;':'Bekijk resultaten &#8594;'}</button>
+              <button class="btn-next" id="nbB${ti}" disabled onclick="nextText(${ti})" style="margin-top:.5rem;">${ti<texts.length-1?'Volgende tekst &#8594;':'Bekijk resultaten &#8594;'}</button>
             </div>
           </div>
         </div>
@@ -661,7 +707,8 @@ function buildAnsCard(q,ti){
 
 function buildTabs(){
   const t=document.getElementById('tabs');
-  t.innerHTML=TEXTS.map((tx,i)=>
+  const texts=EXAMS[currentExam].texts;
+  t.innerHTML=texts.map((tx,i)=>
     `<div class="tab-item" id="tab${i}" onclick="goToPage(${i})" style="cursor:pointer;"><div class="tab-dot" id="tabdot${i}"></div>${tx.pt}</div>`
   ).join('<span class="tab-sep">&#8250;</span>');
 }
@@ -682,7 +729,7 @@ function predict(qId,ti,chosen){
   if(card)card.classList.add('pred-done');
 
   // Check if all MC on this page predicted → enable "Lees de tekst" button
-  const mcQs=TEXTS[ti].questions.filter(q=>q.type==='mc');
+  const mcQs=EXAMS[currentExam].texts[ti].questions.filter(q=>q.type==='mc');
   if(mcQs.every(q=>S.qs[q.id].pred!==null)){
     const btn=document.getElementById('nbA'+ti);
     const info=document.getElementById('niA'+ti);
@@ -764,7 +811,7 @@ function revealOpen(qId,ti){
 }
 
 function checkPageDone(ti){
-  const text=TEXTS[ti];
+  const text=EXAMS[currentExam].texts[ti];
   let total=0, done=0;
   text.questions.forEach(q=>{
     total++;
@@ -778,7 +825,7 @@ function checkPageDone(ti){
   const ni=document.getElementById('niB'+ti);
   if(nb)nb.disabled=false;
   if(ni)ni.textContent='\u2713 Alle vragen klaar \u2014 ga verder!';
-  TEXTS.forEach((_,j)=>{
+  EXAMS[currentExam].texts.forEach((_,j)=>{
     const d=document.getElementById('pdA'+j+'x'+ti);
     if(d){d.classList.remove('cur');d.classList.add('done');}
     const lbl=document.getElementById('pdAlbl'+j+'x'+ti);
@@ -791,14 +838,14 @@ function checkPageDone(ti){
 function findQ(qId){for(const t of TEXTS){const q=t.questions.find(q=>q.id===qId);if(q)return q;}}
 
 function updDot(qId,ti,cls){
-  TEXTS.forEach((_,j)=>{
+  EXAMS[currentExam].texts.forEach((_,j)=>{
     const el=document.getElementById('qd'+j+'x'+qId);
     if(el)el.className='q-dot '+cls;
   });
 }
 
 function updateProg(){
-  const total=TEXTS.flatMap(t=>t.questions).length;
+  const total=EXAMS[currentExam].texts.flatMap(t=>t.questions).length;
   const done=Object.values(S.qs).filter(q=>q.ans!==null||q.modelShown).length;
   document.getElementById('prog').style.width=(done/total*100)+'%';
   document.getElementById('hdr-c').textContent=S.correct;
@@ -806,7 +853,7 @@ function updateProg(){
 }
 
 function updateTabs(){
-  TEXTS.forEach((_,i)=>{
+  EXAMS[currentExam].texts.forEach((_,i)=>{
     const tab=document.getElementById('tab'+i);
     const dot=document.getElementById('tabdot'+i);
     if(!tab)return;
@@ -818,7 +865,7 @@ function updateTabs(){
 }
 
 function pageDone(ti){
-  return TEXTS[ti].questions.every(q=>{
+  return EXAMS[currentExam].texts[ti].questions.every(q=>{
     const qs=S.qs[q.id];
     return q.type==='mc'?qs.ans!==null:qs.modelShown;
   });
@@ -826,7 +873,7 @@ function pageDone(ti){
 
 // ── RESULTS ───────────────────────────────────────────
 function showResults(){
-  const mcTotal=TEXTS.flatMap(t=>t.questions).filter(q=>q.type==='mc').length;
+  const mcTotal=EXAMS[currentExam].texts.flatMap(t=>t.questions).filter(q=>q.type==='mc').length;
   const pct=S.correct/mcTotal;
   document.getElementById('r-emoji').innerHTML=pct>=.8?'&#127942;':pct>=.6?'&#128077;':'&#128170;';
   document.getElementById('r-score').textContent=S.correct+'/'+mcTotal;
@@ -839,7 +886,7 @@ function showResults(){
 }
 
 function restart(){
-  show('s-intro');
+  goBackToSelect();
   document.getElementById('prog').style.width='0%';
   document.getElementById('hdr-c').textContent='0';
   document.getElementById('hdr-w').textContent='0';
