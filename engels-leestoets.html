@@ -264,9 +264,14 @@ header{background:var(--ink);color:var(--paper);padding:0 2rem;height:58px;displ
   </div>
 </div>
 
+<!-- Load 2021 & 2022 exam data from external file -->
+<script src="exams_data.js"></script>
+
 <script>
 // \u2500\u2500 MULTI-EXAM ARCHITECTURE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
-const EXAMS={
+// 2023 exam data (defined below) + 2021 & 2022 data (loaded from exams_data.js)
+
+const EXAMS_2023={
   '2023':{year:2023,texts:[
   {id:1,pt:'Tekst 1',title:'Smart Rubbish Bin',source:'dailymail.co.uk, 2019',secs:40,
    paras:['It is one of the most forgotten and painful chores \u2013 taking out the trash. Now, SmartCan, developed by the firm Rezzi, eliminates the need for homeowners to drag their garbage cans to the curb by providing a motorized trash can attachment and corresponding mobile app. Users can set the specific day and time they need their trash to be at the curb for pickup, and the SmartCan attachment will get it there autonomously. Once picked up by collectors, the robotic trash can heads back to its base after having sensed the vertical movement.',
@@ -387,8 +392,13 @@ const EXAMS={
     {id:'q33',num:'Vraag 33',pts:1,type:'mc',text:'What becomes clear about Max Vredenburgh?',paraRef:null,strat:'key',opts:['A \u2014 He finally met his French pen pal after years of writing letters.','B \u2014 He found a letter on the beach when he was a boy.','C \u2014 He hopes to keep in touch with the finder of his letter.','D \u2014 He was amazed he got a reply to his letter after so many years.'],correct:3,fb:'He compared it to winning the lottery and called it a \u201conce in a lifetime occurrence\u201d \u2014 D is correct.'}
    ]}
   ]},
-  '2022':{year:2022,texts:[]},
-  '2021':{year:2021,texts:[]}
+};
+
+// Load 2021 & 2022 data from exams_data.js and merge with 2023 data
+const EXAMS = {
+  ...EXAMS_2023,
+  '2022': {year: 2022, texts: typeof exam_2022_texts !== 'undefined' ? exam_2022_texts : []},
+  '2021': {year: 2021, texts: typeof exam_2021_texts !== 'undefined' ? exam_2021_texts : []}
 };
 
 const STIP={
